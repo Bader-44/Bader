@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>HSE Safety Management System | Daily Inspection Reports</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #f0f2f5;
+            font-family: 'Inter', sans-serif;
+            padding: 20px;
+            color: #1e293b;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        .header-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 28px;
+            padding: 30px;
+            margin-bottom: 30px;
+            color: white;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);
+        }
+
+        .header-card h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+        .header-card p { opacity: 0.85; font-size: 14px; }
+
+        .observation-card {
+            background: white; border-radius: 28px; margin-bottom: 28px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05); transition: transform 0.2s;
+            overflow: hidden; border: 1px solid rgba(0,0,0,0.05);
+        }
+        .observation-card:hover { box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+
+        .card-header {
+            background: #f8fafc; padding: 18px 24px; display: flex;
+            justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0;
+        }
+
+        .badge-risk {
+            background: #dc2626; color: white; padding: 6px 16px;
+            border-radius: 40px; font-size: 13px; font-weight: 700;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+
+        .delete-btn {
+            background: none; border: none; color: #94a3b8; font-size: 14px;
+            cursor: pointer; transition: 0.2s; padding: 8px 12px; border-radius: 12px;
+            font-family: 'Inter', sans-serif; font-weight: 600;
+        }
+        .delete-btn:hover { color: #dc2626; background: #fee2e2; }
+
+        .card-body { padding: 24px; }
+
+        .form-row { margin-bottom: 20px; }
+        .form-row label { display: block; font-weight: 700; margin-bottom: 8px; color: #334155; font-size: 13px; }
+        .form-row input, .form-row textarea, .form-row select {
+            width: 100%; padding: 10px 14px; border: 2px solid #e2e8f0;
+            border-radius: 14px; font-family: 'Inter', sans-serif; font-size: 13px;
+            transition: 0.2s; background: #fefefe;
+        }
+        .form-row input:focus, .form-row textarea:focus, .form-row select:focus {
+            outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+        .form-row textarea { min-height: 80px; resize: vertical; }
+
+        .two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+
+        .images-grid { display: flex; flex-wrap: wrap; gap: 28px; margin: 20px 0 24px; }
+
+        .image-card {
+            flex: 1; min-width: 300px; background: #fefce8;
+            border-radius: 24px; padding: 18px; border: 1px solid rgba(253,224,71,0.2);
+        }
+        .image-card:last-child { background: #f0fdf4; border-color: rgba(134,239,172,0.2); }
+        .image-card h4 { font-size: 15px; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; font-weight: 700; }
+
+        .image-preview-box {
+            background: white; border-radius: 20px; min-height: 280px;
+            border: 2px dashed #cbd5e1; padding: 12px; margin-bottom: 14px;
+            display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start;
+        }
+
+        .img-thumb {
+            position: relative; width: calc(50% - 6px); height: 180px;
+            border-radius: 14px; overflow: hidden; border: 2px solid #e2e8f0;
+            cursor: pointer;
+        }
+        .img-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .img-thumb:hover { opacity: 0.9; transform: scale(1.02); transition: 0.2s; }
+
+        .remove-img-icon {
+            position: absolute; top: -8px; right: -8px; background: #dc2626;
+            color: white; border: none; border-radius: 50%; width: 26px; height: 26px;
+            font-size: 12px; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; font-weight: bold; z-index: 10;
+        }
+        .remove-img-icon:hover { transform: scale(1.1); background: #b91c1c; }
+
+        .upload-btn-sm {
+            background: #f1f5f9; border: none; padding: 10px 16px;
+            border-radius: 40px; font-size: 13px; font-weight: 600;
+            cursor: pointer; width: 100%; transition: 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+        .upload-btn-sm:hover { background: #3b82f6; color: white; }
+
+        .action-bar { display: flex; flex-wrap: wrap; gap: 16px; margin: 32px 0 24px; justify-content: center; }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white; border: none; padding: 12px 28px; border-radius: 60px;
+            font-weight: 700; font-size: 14px; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 10px;
+            transition: 0.2s; font-family: 'Inter', sans-serif;
+        }
+        .btn-print { background: linear-gradient(135deg, #10b981, #059669); }
+        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .btn-primary:hover { transform: translateY(-2px); opacity: 0.9; }
+
+        .empty-state { text-align: center; padding: 70px 20px; background: white; border-radius: 32px; color: #64748b; }
+
+        footer { text-align: center; padding: 28px; color: #64748b; font-size: 13px; }
+
+        .toast-msg {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: #1e293b; color: white; padding: 12px 24px;
+            border-radius: 60px; font-weight: 500; z-index: 9999; display: none;
+        }
+
+        /* Lightbox for full screen image */
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+        .lightbox.show { display: flex; }
+
+        #printModal {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.88); z-index: 9999; overflow: auto; padding: 24px 12px;
+        }
+        #printModalInner { max-width: 1000px; margin: 0 auto; }
+        #printModalBar {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
+            background: #1e293b; padding: 15px 20px; border-radius: 15px;
+        }
+        #printModalBar span { font-size: 18px; font-weight: 700; color: #fbbf24; }
+        #printModalBar .modal-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+        #printModalBar button {
+            border: none; border-radius: 10px; padding: 8px 18px;
+            font-size: 13px; font-weight: 700; cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+        #previewArea { background: #fff; border-radius: 12px; padding: 30px; color: #000; }
+
+        @media (max-width: 768px) {
+            .images-grid { flex-direction: column; }
+            .header-card h1 { font-size: 22px; }
+            .img-thumb { width: 100%; height: 200px; }
+            .two-columns { grid-template-columns: 1fr; gap: 15px; }
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .action-bar, .btn-primary, .toast-msg, #printModalBar, .remove-img-icon, .upload-btn-sm { display: none !important; }
+            .observation-card { break-inside: avoid; }
+            .img-thumb { width: 100%; height: auto; }
+            .img-thumb img { max-width: 100%; height: auto; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header-card">
+        <h1><i class="fas fa-shield-alt"></i> HSE Safety Management System</h1>
+        <p>Hazard Documentation - Before & After Photos - Corrective Actions</p>
+    </div>
+
+    <div id="observationsList"></div>
+
+    <div class="action-bar">
+        <button class="btn-primary" id="addObservationBtn"><i class="fas fa-plus-circle"></i> New Observation</button>
+        <button class="btn-primary btn-print" id="printReportBtn"><i class="fas fa-print"></i> Preview & Print</button>
+        <button class="btn-primary btn-danger" id="clearAllBtn"><i class="fas fa-trash-alt"></i> Clear All</button>
+    </div>
+    <footer><i class="fas fa-file-alt"></i> HSE Professional Report - Before & After Corrective Actions</footer>
+</div>
+
+<!-- Lightbox for full screen images -->
+<div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <img id="lightboxImg" src="">
+</div>
+
+<div id="printModal">
+    <div id="printModalInner">
+        <div id="printModalBar">
+            <span>📄 Print Preview</span>
+            <div class="modal-btns">
+                <button onclick="doPrint()" style="background:#fbbf24;color:#0f172a;">🖨️ Print</button>
+                <button onclick="downloadReport()" style="background:#10b981;color:#fff;">📥 Save HTML</button>
+                <button onclick="document.getElementById('printModal').style.display='none'" style="background:#ef4444;color:#fff;">✕ Close</button>
+            </div>
+        </div>
+        <div id="previewArea"></div>
+    </div>
+</div>
+
+<div class="toast-msg" id="toastMsg"></div>
+
+<script>
+    // Complete sites list
+    const SITES_LIST = [
+        "Mega WH", "RUH WH74", "SLS WH", "Salasa Head Office",
+        "DS01 Al Munsiyah", "DS02 Narjis / QRA1 / amazon", "DS03 Al Rawbi",
+        "DS03 Alnasim / SPL", "DS04 Aldiriyah / SPL", "DS08 Olaya / SPL",
+        "DS09 Alshifa / SPL", "DS10 Qirwan / SPL",
+        "QRA4 (Othaim 715 - Ghirnatah) amazon", "QRA5 (Othaim 726 – Nassim) amazon",
+        "QRB6 (Namudijiyah) amazon", "QRB5 (Muhammadiyah) amazon",
+        "QRB7 (Khaleej) amazon", "QRA9 AL sawdi amazon", "AL Malaz amazon",
+        "WH Shar / Hunger station", "WH Salasa / MASlogistics", "WH Salasa / GES",
+        "JED", "Salasa WH JED", "Salasa WJ JED02",
+        "DMM", "Salasa WH DMM", "SLS AL Hasa"
+    ];
+
+    let observations = [];
+    let nextId = 1;
+
+    const observationsContainer = document.getElementById('observationsList');
+
+    function showMessage(text, isError = false) {
+        const toast = document.getElementById('toastMsg');
+        toast.textContent = text;
+        toast.style.background = isError ? '#dc2626' : '#10b981';
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 2800);
+    }
+
+    function saveData() {
+        try {
+            localStorage.setItem('hse_obs_english', JSON.stringify(observations));
+        } catch(e) {}
+    }
+
+    function loadData() {
+        try {
+            const s = localStorage.getItem('hse_obs_english');
+            if (s) { 
+                observations = JSON.parse(s); 
+                if (observations.length) {
+                    nextId = Math.max(...observations.map(o => o.id)) + 1;
+                } else {
+                    nextId = 1;
+                }
+            }
+        } catch(e) {}
+    }
+
+    function updateField(id, field, value) {
+        const obs = observations.find(o => o.id === id);
+        if (obs) { obs[field] = value; saveData(); }
+    }
+
+    function openLightbox(src) {
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightboxImg');
+        lightboxImg.src = src;
+        lightbox.classList.add('show');
+    }
+
+    function closeLightbox() {
+        document.getElementById('lightbox').classList.remove('show');
+    }
+
+    function addImages(obsId, type, files) {
+        const obs = observations.find(o => o.id === obsId);
+        if (!obs || !files || !files.length) return;
+        let done = 0;
+        const total = Array.from(files).filter(f => f.type.startsWith('image/')).length;
+        if (!total) return;
+        Array.from(files).forEach(file => {
+            if (!file.type.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const src = e.target.result;
+                if (type === 'before') obs.beforeImages.push(src);
+                else obs.afterImages.push(src);
+                done++;
+                const boxId = type === 'before' ? `before-box-${obsId}` : `after-box-${obsId}`;
+                const box = document.getElementById(boxId);
+                if (box) {
+                    const placeholder = box.querySelector('.no-img-placeholder');
+                    if (placeholder) placeholder.remove();
+                    const idx = (type === 'before' ? obs.beforeImages : obs.afterImages).length - 1;
+                    const thumb = document.createElement('div');
+                    thumb.className = 'img-thumb';
+                    thumb.onclick = (e) => { e.stopPropagation(); openLightbox(src); };
+                    thumb.innerHTML = `<img src="${src}"><button class="remove-img-icon" onclick="event.stopPropagation(); removeImage(${obsId},'${type}',${idx})">✕</button>`;
+                    box.appendChild(thumb);
+                }
+                if (done === total) { saveData(); showMessage(`✓ ${total} image(s) added`); }
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function removeImage(obsId, type, index) {
+        const obs = observations.find(o => o.id === obsId);
+        if (obs) {
+            if (type === 'before') obs.beforeImages.splice(index, 1);
+            else obs.afterImages.splice(index, 1);
+            saveData();
+            const boxId = type === 'before' ? `before-box-${obsId}` : `after-box-${obsId}`;
+            const box = document.getElementById(boxId);
+            if (box) {
+                const images = type === 'before' ? obs.beforeImages : obs.afterImages;
+                if (!images.length) box.innerHTML = `<div class="no-img-placeholder" style="width:100%;text-align:center;color:#94a3b8;padding:20px;"><i class="fas fa-camera"></i> No images</div>`;
+                else {
+                    box.innerHTML = images.map((src, i) => `<div class="img-thumb" onclick="openLightbox('${src}')"><img src="${src}"><button class="remove-img-icon" onclick="event.stopPropagation(); removeImage(${obsId},'${type}',${i})">✕</button></div>`).join('');
+                }
+            }
+            showMessage('✓ Image removed');
+        }
+    }
+
+    function deleteObservation(id) {
+        if (confirm('⚠️ Are you sure you want to delete this observation?')) {
+            observations = observations.filter(o => o.id !== id);
+            saveData(); 
+            renderObservations(); 
+            showMessage('✓ Observation deleted');
+        }
+    }
+
+    function addNewObservation() {
+        const today = new Date().toISOString().split('T')[0];
+        const newObs = { 
+            id: nextId++, 
+            site: SITES_LIST[0], 
+            visitDate: today,
+            problemDesc: '', 
+            potentialRisks: '', 
+            correctiveActions: '', 
+            beforeImages: [], 
+            afterImages: [] 
+        };
+        observations.push(newObs);
+        saveData(); 
+        renderObservations();
+        setTimeout(() => {
+            const card = document.querySelector(`.observation-card[data-id='${newObs.id}']`);
+            if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+        showMessage('✓ New observation added');
+    }
+
+    function clearAllData() {
+        if (confirm('⚠️ WARNING: This will delete ALL observations and images. Are you sure?')) {
+            observations = []; 
+            nextId = 1; 
+            saveData(); 
+            renderObservations(); 
+            showMessage('✓ All data cleared');
+        }
+    }
+
+    function escapeHtml(str) {
+        return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function buildSiteOptions(selected) {
+        return SITES_LIST.map(s => `<option value="${escapeHtml(s)}" ${selected === s ? 'selected' : ''}>${escapeHtml(s)}</option>`).join('');
+    }
+
+    function renderObservations() {
+        if (!observationsContainer) return;
+        if (!observations.length) {
+            observationsContainer.innerHTML = `<div class="empty-state"><i class="fas fa-clipboard-list" style="font-size:60px;opacity:0.4;margin-bottom:20px;"></i><h3>No Safety Observations</h3><p>Click "New Observation" to document hazards with before/after photos.</p></div>`;
+            return;
+        }
+        
+        let html = '';
+        observations.forEach((obs, idx) => {
+            const beforeImages = obs.beforeImages || [];
+            const afterImages = obs.afterImages || [];
+            const beforeHtml = beforeImages.length ? beforeImages.map((src, i) => `<div class="img-thumb" onclick="openLightbox('${src}')"><img src="${src}"><button class="remove-img-icon" onclick="event.stopPropagation(); removeImage(${obs.id},'before',${i})">✕</button></div>`).join('') : '<div class="no-img-placeholder" style="width:100%;text-align:center;color:#94a3b8;padding:20px;"><i class="fas fa-camera"></i> No images</div>';
+            const afterHtml = afterImages.length ? afterImages.map((src, i) => `<div class="img-thumb" onclick="openLightbox('${src}')"><img src="${src}"><button class="remove-img-icon" onclick="event.stopPropagation(); removeImage(${obs.id},'after',${i})">✕</button></div>`).join('') : '<div class="no-img-placeholder" style="width:100%;text-align:center;color:#94a3b8;padding:20px;"><i class="fas fa-camera"></i> No images</div>';
+            
+            html += `
+            <div class="observation-card" data-id="${obs.id}">
+                <div class="card-header">
+                    <span class="badge-risk"><i class="fas fa-exclamation-triangle"></i> Hazard Report #${idx + 1}</span>
+                    <button class="delete-btn" onclick="deleteObservation(${obs.id})"><i class="fas fa-trash-alt"></i> Delete</button>
+                </div>
+                <div class="card-body">
+                    <div class="two-columns">
+                        <div class="form-row">
+                            <label><i class="fas fa-map-marker-alt"></i> Site / Location</label>
+                            <select onchange="updateField(${obs.id},'site',this.value)">
+                                ${buildSiteOptions(obs.site || '')}
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <label><i class="fas fa-calendar-alt"></i> Visit Date</label>
+                            <input type="date" value="${obs.visitDate || ''}" onchange="updateField(${obs.id},'visitDate',this.value)">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label><i class="fas fa-file-alt"></i> Problem Description / Unsafe Condition</label>
+                        <input type="text" value="${escapeHtml(obs.problemDesc)}" onchange="updateField(${obs.id},'problemDesc',this.value)" placeholder="Exposed electrical cables, unstable scaffolding, chemical spill...">
+                    </div>
+                    <div class="form-row">
+                        <label><i class="fas fa-biohazard"></i> Potential Hazards / Risks</label>
+                        <textarea onchange="updateField(${obs.id},'potentialRisks',this.value)" placeholder="Electric shock, fall from height, fire, health exposure...">${escapeHtml(obs.potentialRisks)}</textarea>
+                    </div>
+                    <div class="images-grid">
+                        <div class="image-card">
+                            <h4><i class="fas fa-camera-retro" style="color:#e67e22;"></i> BEFORE — Hazard Evidence</h4>
+                            <div class="image-preview-box" id="before-box-${obs.id}">${beforeHtml}</div>
+                            <input type="file" accept="image/*" multiple style="display:none" id="bf_${obs.id}">
+                            <button class="upload-btn-sm" onclick="document.getElementById('bf_${obs.id}').click()"><i class="fas fa-upload"></i> Upload Before Photos</button>
+                        </div>
+                        <div class="image-card">
+                            <h4><i class="fas fa-check-circle" style="color:#10b981;"></i> AFTER — Corrective Action</h4>
+                            <div class="image-preview-box" id="after-box-${obs.id}">${afterHtml}</div>
+                            <input type="file" accept="image/*" multiple style="display:none" id="af_${obs.id}">
+                            <button class="upload-btn-sm" onclick="document.getElementById('af_${obs.id}').click()"><i class="fas fa-upload"></i> Upload After Photos</button>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label><i class="fas fa-tools"></i> Corrective Actions Taken</label>
+                        <textarea rows="2" onchange="updateField(${obs.id},'correctiveActions',this.value)" placeholder="Immediate actions taken: insulated cables, installed guardrails, removed hazard...">${escapeHtml(obs.correctiveActions)}</textarea>
+                    </div>
+                </div>
+            </div>`;
+        });
+        observationsContainer.innerHTML = html;
+        
+        for (let obs of observations) {
+            const bf = document.getElementById(`bf_${obs.id}`);
+            if (bf) bf.onchange = e => { addImages(obs.id, 'before', e.target.files); e.target.value = ''; };
+            const af = document.getElementById(`af_${obs.id}`);
+            if (af) af.onchange = e => { addImages(obs.id, 'after', e.target.files); e.target.value = ''; };
+        }
+    }
+
+    function openPrintPreview() {
+        if (!observations.length) { showMessage('No observations to print', true); return; }
+        
+        let html = `<div style="border-bottom:3px solid #dc2626;padding-bottom:18px;margin-bottom:22px;">
+            <div style="font-size:22px;font-weight:800;color:#0f172a;">HSE Safety Management System</div>
+            <div style="font-size:12px;color:#64748b;">Inspection Report - Hazard Documentation & Corrective Actions</div>
+            <div style="display:flex;justify-content:space-between;margin-top:15px;background:#f8fafc;padding:12px;border-radius:12px;flex-wrap:wrap;">
+                <div><strong>Total Reports:</strong> ${observations.length}</div>
+                <div><strong>Print Date:</strong> ${new Date().toLocaleDateString('en-US')}</div>
+            </div>
+        </div>`;
+        
+        observations.forEach((obs, idx) => {
+            const beforeImgs = obs.beforeImages?.length ? obs.beforeImages.map(src => `<img src="${src}" style="width:100%;margin-bottom:12px;border-radius:10px;border:1px solid #e2e8f0;">`).join('') : '<div style="color:#94a3b8;padding:20px;text-align:center;">No images uploaded</div>';
+            const afterImgs = obs.afterImages?.length ? obs.afterImages.map(src => `<img src="${src}" style="width:100%;margin-bottom:12px;border-radius:10px;border:1px solid #e2e8f0;">`).join('') : '<div style="color:#94a3b8;padding:20px;text-align:center;">No images uploaded</div>';
+            html += `<div style="margin-bottom:25px;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;break-inside:avoid;">
+                <div style="background:#f8fafc;padding:12px 18px;border-bottom:1px solid #e2e8f0;">
+                    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px;">
+                        <span style="background:#dc2626;color:#fff;padding:4px 14px;border-radius:30px;font-size:12px;">Hazard #${idx + 1}</span>
+                        <span style="font-size:12px;color:#64748b;"><i class="fas fa-map-marker-alt"></i> ${obs.site || 'Not specified'} | <i class="fas fa-calendar"></i> ${obs.visitDate || 'Not specified'}</span>
+                    </div>
+                    <p style="margin-top:10px;font-weight:700;">${obs.problemDesc || 'No description'}</p>
+                </div>
+                <div style="padding:15px;">
+                    ${obs.potentialRisks ? `<div style="background:#fef2f2;padding:10px;border-radius:8px;margin-bottom:12px;"><strong>⚠️ Risks:</strong> ${obs.potentialRisks}</div>` : ''}
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                        <div style="background:#fffbeb;padding:12px;border-radius:12px;"><strong>📸 BEFORE - Hazard Evidence</strong><br><br>${beforeImgs}</div>
+                        <div style="background:#f0fdf4;padding:12px;border-radius:12px;"><strong>✅ AFTER - Corrective Action</strong><br><br>${afterImgs}</div>
+                    </div>
+                    ${obs.correctiveActions ? `<div style="background:#f8fafc;padding:10px;border-radius:8px;margin-top:12px;"><strong>🛠️ Actions Taken:</strong> ${obs.correctiveActions}</div>` : ''}
+                </div>
+            </div>`;
+        });
+        
+        html += `<div style="text-align:center;margin-top:30px;padding-top:20px;border-top:1px solid #ddd;">
+            <div style="display:flex;justify-content:space-between;margin-top:20px;">
+                <div>Inspector Signature: __________________</div>
+                <div>HSE Manager Signature: __________________</div>
+            </div>
+        </div>`;
+        document.getElementById('previewArea').innerHTML = html;
+        document.getElementById('printModal').style.display = 'block';
+    }
+
+    function getReportHTML() {
+        const content = document.getElementById('previewArea').innerHTML;
+        return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>HSE Safety Report</title>
+        <style>@page{margin:14mm 12mm;}*{box-sizing:border-box;} body{font-family:Arial,sans-serif;padding:28px;max-width:1000px;margin:0 auto;} img{max-width:100%;border-radius:8px;}</style>
+        </head><body>${content}</body></html>`;
+    }
+
+    function doPrint() { 
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(getReportHTML());
+        printWindow.document.close();
+        printWindow.print();
+        showMessage('✓ Report opened for printing');
+    }
+    
+    function downloadReport() {
+        const html = getReportHTML();
+        const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `HSE_Report_${new Date().toISOString().split('T')[0]}.html`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showMessage('✓ Report saved');
+    }
+
+    document.getElementById('addObservationBtn').addEventListener('click', addNewObservation);
+    document.getElementById('printReportBtn').addEventListener('click', openPrintPreview);
+    document.getElementById('clearAllBtn').addEventListener('click', clearAllData);
+
+    loadData();
+    if (!observations.length) {
+        const today = new Date().toISOString().split('T')[0];
+        observations.push({ 
+            id: nextId++, 
+            site: SITES_LIST[0], 
+            visitDate: today,
+            problemDesc: 'Exposed electrical cables near walkway', 
+            potentialRisks: 'Electric shock, trip hazard, fire risk', 
+            correctiveActions: 'Installed cable covers, rerouted cables, safety notice posted', 
+            beforeImages: [], 
+            afterImages: [] 
+        });
+        saveData();
+    }
+    renderObservations();
+</script>
+</body>
+</html>
